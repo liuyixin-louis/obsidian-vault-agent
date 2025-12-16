@@ -9,13 +9,14 @@
 [latest release]: https://github.com/polyipseity/obsidian-terminal/releases/latest
 [repository]: https://github.com/polyipseity/obsidian-terminal
 [trailer]: https://raw.githubusercontent.com/polyipseity/obsidian-terminal/main/assets/trailer.png
+[claude-demo]: assets/claude-terminal-demo.png
 Integrate consoles, shells, and terminals inside [Obsidian].
 
 [![Buy Me a Coffee/embed]][Buy Me a Coffee]
 
 __[Repository] · [Changelog] · [Features](#features) · [Installation](#installation) · [Usage](#usage) · [Contributing](#contributing) · [Security](#security)__
 
-![Trailer]
+![Claude Code in Obsidian Terminal][claude-demo]
 
 For first time users, read the [installation](#installation) section first!
 
