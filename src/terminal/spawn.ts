@@ -87,6 +87,7 @@ export function spawnTerminal(
 	const state: TerminalView.State = {
 		cwd: options.cwd ?? null,
 		focus: context.settings.value.focusOnNewInstance,
+		initialCommands: [],
 		profile,
 		serial: null,
 	}

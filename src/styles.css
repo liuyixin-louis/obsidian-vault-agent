@@ -1,3 +1,75 @@
 @import "@polyipseity/obsidian-plugin-library/style";
 @import "./terminal/emulator.css";
 @import "./terminal/view.css";
+
+.terminal-ai-open-root-btn {
+	border: 2px solid var(--terminal-ai-accent, #9b59b6);
+	background: transparent;
+	color: var(--terminal-ai-accent, #9b59b6);
+	border-radius: 0;
+	padding: 10px 14px;
+	font-weight: 600;
+	font-size: 13px;
+	letter-spacing: 0.01em;
+	line-height: 1.2;
+	transition: background-color 120ms ease, box-shadow 120ms ease,
+		transform 80ms ease;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	text-align: center;
+	box-sizing: border-box;
+	min-width: 96px;
+	max-width: 180px;
+	width: auto;
+	align-self: center;
+	margin: 6px 6px 0 0;
+}
+
+.terminal-ai-open-root-btn:hover {
+	background-color: color-mix(in srgb,
+		var(--terminal-ai-accent, #9b59b6) 12%,
+		transparent);
+	box-shadow: 0 0 0 2px color-mix(in srgb,
+		var(--terminal-ai-accent, #9b59b6) 20%,
+		transparent) inset;
+}
+
+.terminal-ai-open-root-btn:active {
+	transform: translateY(1px);
+}
+
+/* Dual-reveal highlight styles */
+.dual-reveal-item {
+	position: relative;
+}
+
+/* Stripe A (left side, primary highlight) */
+.dual-reveal-a::before {
+	content: "";
+	position: absolute;
+	left: 0;
+	top: 2px;
+	bottom: 2px;
+	width: 3px;
+	border-radius: 3px;
+	background: var(--text-accent);
+	opacity: 0.9;
+	pointer-events: none;
+	z-index: 1;
+}
+
+/* Stripe B (offset left, secondary highlight) */
+.dual-reveal-b::after {
+	content: "";
+	position: absolute;
+	left: 5px;
+	top: 2px;
+	bottom: 2px;
+	width: 3px;
+	border-radius: 3px;
+	background: var(--text-muted);
+	opacity: 0.85;
+	pointer-events: none;
+	z-index: 1;
+}

@@ -1,3 +1,4 @@
+/* eslint-disable sort-imports */
 import {
 	CONTROL_SEQUENCE_INTRODUCER as CSI,
 	CursoredText,
@@ -57,11 +58,13 @@ import type { DeveloperConsoleContext } from "obsidian-terminal"
 import { DisposerAddon } from "./emulator-addons.js"
 import type { FileResult } from "tmp-promise"
 import type { Log } from "../patch.js"
+import type { TerminalPlugin } from "../main.js"
+import type { Settings } from "../settings-data.js"
 import type {
 	ChildProcessWithoutNullStreams as PipedChildProcess,
 } from "node:child_process"
+import type { Writable } from "node:stream"
 import type { Position } from "source-map"
-import type { TerminalPlugin } from "../main.js"
 import ansi from "ansi-escape-sequences"
 import unixPseudoterminalPy from "./unix_pseudoterminal.py"
 import win32ResizerPy from "./win32_resizer.py"
@@ -82,6 +85,136 @@ const
 	tmpPromise =
 		dynamicRequire<typeof import("tmp-promise")>(
 			BUNDLE, "tmp-promise")
+
+function deleteWordSequence(
+	binding: Settings.DeleteWordKeybinding,
+): string | null {
+	switch (binding) {
+		case "ctrl-w":
+			return "\u0017"
+		case "esc-del":
+			return "\u001B\u007F"
+		case "off":
+			return null
+		default:
+			return null
+	}
+}
+
+function shouldHandleDeleteWord(event: KeyboardEvent): boolean {
+	if (event.key !== "Backspace") { return false }
+	if (event.ctrlKey) { return true }
+	if (Platform.CURRENT === "darwin" && (event.altKey || event.metaKey)) {
+		return true
+	}
+	return false
+}
+
+function cmdBackspaceSequence(
+	binding: Settings.CmdBackspaceBehavior,
+): string | null {
+	switch (binding) {
+		case "killBolAndEol":
+			return "\u0015\u000B"
+		case "killWholeLine":
+			return "\u0001\u000B"
+		case "killToBol":
+			return "\u0015"
+		case "off":
+			return null
+		default:
+			return null
+	}
+}
+
+function shouldHandleCmdBackspace(event: KeyboardEvent): boolean {
+	if (Platform.CURRENT !== "darwin") { return false }
+	if (!event.metaKey) { return false }
+	return event.key === "Backspace" || event.key === "Delete"
+}
+
+function cmdArrowSequence(event: KeyboardEvent): string | null {
+	if (event.key === "ArrowLeft") {
+		return "\u0001" // Ctrl+A
+	}
+	if (event.key === "ArrowRight") {
+		return "\u0005" // Ctrl+E
+	}
+	return null
+}
+
+function shouldHandleCmdArrow(event: KeyboardEvent): boolean {
+	if (Platform.CURRENT !== "darwin") { return false }
+	if (!event.metaKey) { return false }
+	return event.key === "ArrowLeft" || event.key === "ArrowRight"
+}
+
+function registerDeleteWordHandler(
+	plugin: TerminalPlugin,
+	terminal: Terminal,
+	stdin: Writable | null,
+): import("@xterm/xterm").IDisposable | null {
+	if (!stdin) { return null }
+	return terminal.onKey(({ domEvent }) => {
+		const sequence = deleteWordSequence(
+			plugin.settings.value.deleteWordKeybinding,
+		)
+		if (sequence === null) { return }
+		if (!shouldHandleDeleteWord(domEvent)) { return }
+		try {
+			domEvent.preventDefault()
+			domEvent.stopPropagation()
+			void writePromise(stdin, sequence)
+		} catch (error) {
+			activeSelf(domEvent).console.error(error)
+		}
+	})
+}
+
+function registerCmdBackspaceHandler(
+	plugin: TerminalPlugin,
+	terminal: Terminal,
+	stdin: Writable | null,
+): import("@xterm/xterm").IDisposable | null {
+	if (!stdin) { return null }
+	return terminal.onKey(({ domEvent }) => {
+		if (!shouldHandleCmdBackspace(domEvent)) { return }
+		const sequence = cmdBackspaceSequence(
+			plugin.settings.value.cmdBackspaceBehavior,
+		)
+		if (sequence === null) { return }
+		try {
+			domEvent.preventDefault()
+			domEvent.stopPropagation()
+			void writePromise(stdin, sequence)
+		} catch (error) {
+			activeSelf(domEvent).console.error(error)
+		}
+	})
+}
+
+function registerCmdArrowHandler(
+	terminal: Terminal,
+	stdin: Writable | null,
+): import("@xterm/xterm").IDisposable | null {
+	if (!stdin) { return null }
+	const handler = (domEvent: KeyboardEvent): boolean => {
+		if (!shouldHandleCmdArrow(domEvent)) { return true }
+		if (terminal.buffer.active.type === "alternate") { return true }
+		const sequence = cmdArrowSequence(domEvent)
+		if (sequence === null) { return true }
+		try {
+			domEvent.preventDefault()
+			domEvent.stopPropagation()
+			void writePromise(stdin, sequence)
+		} catch (error) {
+			activeSelf(domEvent).console.error(error)
+		}
+		return false
+	}
+	terminal.attachCustomKeyEventHandler(handler)
+	return { dispose() {} }
+}
 
 async function clearTerminal(terminal: Terminal, keep = false): Promise<void> {
 	const { rows } = terminal
@@ -906,10 +1039,29 @@ class WindowsPseudoterminal implements Pseudoterminal {
 		))
 		shell.stdout.on("data", reader)
 		shell.stderr.on("data", reader)
-		const writer =
-			terminal.onData(async data => writePromise(shell.stdin, data))
+		const deleteWordHandler = registerDeleteWordHandler(
+				this.context,
+				terminal,
+				shell.stdin,
+			),
+			cmdBackspaceHandler = registerCmdBackspaceHandler(
+				this.context,
+				terminal,
+				shell.stdin,
+			),
+			cmdArrowHandler = registerCmdArrowHandler(
+				terminal,
+				shell.stdin,
+			),
+			writer =
+				terminal.onData(async data => writePromise(shell.stdin, data))
 		this.onExit.catch(noop satisfies () => unknown as () => unknown)
-			.finally(() => { writer.dispose() })
+			.finally(() => {
+				deleteWordHandler?.dispose()
+				cmdBackspaceHandler?.dispose()
+				cmdArrowHandler?.dispose()
+				writer.dispose()
+			})
 	}
 }
 
@@ -990,10 +1142,29 @@ class UnixPseudoterminal implements Pseudoterminal {
 		))
 		shell.stdout.on("data", reader)
 		shell.stderr.on("data", reader)
-		const writer =
-			terminal.onData(async data => writePromise(shell.stdin, data))
+		const deleteWordHandler = registerDeleteWordHandler(
+				this.context,
+				terminal,
+				shell.stdin,
+			),
+			cmdBackspaceHandler = registerCmdBackspaceHandler(
+				this.context,
+				terminal,
+				shell.stdin,
+			),
+			cmdArrowHandler = registerCmdArrowHandler(
+				terminal,
+				shell.stdin,
+			),
+			writer =
+				terminal.onData(async data => writePromise(shell.stdin, data))
 		this.onExit.catch(noop satisfies () => unknown as () => unknown)
-			.finally(() => { writer.dispose() })
+			.finally(() => {
+				deleteWordHandler?.dispose()
+				cmdBackspaceHandler?.dispose()
+				cmdArrowHandler?.dispose()
+				writer.dispose()
+			})
 	}
 
 	public async resize(columns: number, rows: number): Promise<void> {

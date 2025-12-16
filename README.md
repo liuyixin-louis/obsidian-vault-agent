@@ -1,4 +1,4 @@
-# Terminal for Obsidian [![release](https://img.shields.io/github/v/release/polyipseity/obsidian-terminal)][latest release] [![Obsidian downloads](https://img.shields.io/badge/dynamic/json?logo=Obsidian&color=%238b6cef&label=downloads&query=$["terminal"].downloads&url=https://raw.githubusercontent.com/obsidianmd/obsidian-releases/master/community-plugin-stats.json)][community plugin] [![Python](https://img.shields.io/badge/Python-≥3.10-gold?labelColor=blue&logo=Python&logoColor=white)][Python]
+# Terminal AI for Obsidian (fork) [![release](https://img.shields.io/github/v/release/polyipseity/obsidian-terminal)][latest release] [![Python](https://img.shields.io/badge/Python-≥3.10-gold?labelColor=blue&logo=Python&logoColor=white)][Python]
 
 [Buy Me a Coffee]: https://buymeacoffee.com/polyipseity
 [Buy Me a Coffee/embed]: https://img.buymeacoffee.com/button-api/?text=Buy%20me%20a%20coffee&emoji=&slug=polyipseity&button_colour=40DCA5&font_colour=ffffff&font_family=Lato&outline_colour=000000&coffee_colour=FFDD00
@@ -9,19 +9,17 @@
 [latest release]: https://github.com/polyipseity/obsidian-terminal/releases/latest
 [repository]: https://github.com/polyipseity/obsidian-terminal
 [trailer]: https://raw.githubusercontent.com/polyipseity/obsidian-terminal/main/assets/trailer.png
-[related]: https://github.com/polyipseity/obsidian-monorepo
-
 Integrate consoles, shells, and terminals inside [Obsidian].
 
 [![Buy Me a Coffee/embed]][Buy Me a Coffee]
 
-__[Repository] · [Changelog] · [Community plugin] · [Related] · [Features](#features) · [Installation](#installation) · [Usage](#usage) · [Contributing](#contributing) · [Security](#security)__
+__[Repository] · [Changelog] · [Features](#features) · [Installation](#installation) · [Usage](#usage) · [Contributing](#contributing) · [Security](#security)__
 
 ![Trailer]
 
 For first time users, read the [installation](#installation) section first!
 
-This file is automatically opened on first install. You can reopen it in settings or command palette.
+This fork is renamed (`id: terminal-ai`) to avoid conflicts with the official Terminal plugin. Install it into `.obsidian/plugins/terminal-ai`.
 
 ## Features
 
@@ -34,6 +32,7 @@ This file is automatically opened on first install. You can reopen it in setting
 - Find in terminal.
 - Save terminal history as file.
 - Customize terminal appearance.
+- Push AI context + drag/drop helper files for agents.
 
 ## Installation
 
@@ -89,6 +88,12 @@ This file is automatically opened on first install. You can reopen it in setting
     - \(2\) Open settings
     - \(3\) Open command palette
     - \(4\) Use keyboard shortcuts
+
+### AI helpers (MVP)
+
+- Context push: active file/folder changes are debounced and saved to `.obsidian/ai-context.json` with vault + system paths and `updatedAt`.
+- Drag & drop: dropping files/folders onto the terminal pastes their paths into the terminal.
+- Both helpers use the vault root from the Obsidian file system adapter; when no changes are detected, files are not rewritten.
 
 ### Keyboard shortcuts
 

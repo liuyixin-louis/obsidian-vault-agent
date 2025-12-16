@@ -91,25 +91,122 @@ export class SettingTab extends AdvancedSettingTab<Settings> {
 					() => { this.postMutate() },
 				))
 		})
-			.newSetting(containerEl, setting => {
-				setting
-					.setName(i18n.t("settings.add-to-context-menu"))
-					.addToggle(linkSetting(
-						() => settings.value.addToContextMenu,
-						async value => settings.mutate(settingsM => {
-							settingsM.addToContextMenu = value
-						}),
+		ui.newSetting(containerEl, setting => {
+			setting
+				.setName(i18n.t("settings.add-to-context-menu"))
+				.addToggle(linkSetting(
+					() => settings.value.addToContextMenu,
+					async value => settings.mutate(settingsM => {
+						settingsM.addToContextMenu = value
+					}),
+					() => { this.postMutate() },
+				))
+				.addExtraButton(resetButton(
+					i18n.t("asset:settings.add-to-context-menu-icon"),
+					i18n.t("settings.reset"),
+					async () => settings.mutate(settingsM => {
+						settingsM.addToContextMenu = Settings.DEFAULT.addToContextMenu
+					}),
+					() => { this.postMutate() },
+				))
+		})
+		ui.newSetting(containerEl, setting => {
+			setting
+				.setName("Terminal AI: delete-word keybinding")
+				.setDesc("Map Ctrl/Option+Backspace to send a word-delete sequence " +
+					"to the shell.")
+				.addDropdown(linkSetting(
+					(): string => settings.value.deleteWordKeybinding,
+					setTextToEnum(
+						Settings.DELETE_WORD_KEYBINDINGS,
+						value => {
+							void settings.mutate(settingsM => {
+								settingsM.deleteWordKeybinding = value
+							})
+						},
+					),
+					() => { this.postMutate() },
+					{
+						pre: component => {
+							component.addOptions(Object.fromEntries([
+								["ctrl-w", "Send Ctrl+W (backward-kill-word)"],
+								["esc-del", "Send Esc+Del"],
+								["off", "Off"],
+							]))
+						},
+					},
+				))
+					.addExtraButton(resetButton(
+						i18n.t("asset:settings.add-to-context-menu-icon"),
+						i18n.t("settings.reset"),
+						() => {
+							void settings.mutate(settingsM => {
+								settingsM.deleteWordKeybinding =
+									Settings.DEFAULT.deleteWordKeybinding
+							})
+						},
 						() => { this.postMutate() },
+					))
+			})
+			ui.newSetting(containerEl, setting => {
+				setting
+					.setName("Terminal AI: Cmd+Backspace behavior")
+					.setDesc("Map Cmd+Backspace to clear the current command line inside the terminal.")
+					.addDropdown(linkSetting(
+						(): string => settings.value.cmdBackspaceBehavior,
+						setTextToEnum(
+							Settings.CMD_BACKSPACE_BEHAVIORS,
+							value => {
+								void settings.mutate(settingsM => {
+									settingsM.cmdBackspaceBehavior = value
+								})
+							},
+						),
+						() => { this.postMutate() },
+						{
+							pre: component => {
+								component.addOptions(Object.fromEntries([
+									["killBolAndEol", "Send Ctrl+U then Ctrl+K (clear line)"],
+									["killWholeLine", "Send Ctrl+A then Ctrl+K"],
+									["killToBol", "Send Ctrl+U (kill to beginning of line)"],
+									["off", "Off"],
+								]))
+							},
+						},
 					))
 					.addExtraButton(resetButton(
 						i18n.t("asset:settings.add-to-context-menu-icon"),
 						i18n.t("settings.reset"),
-						async () => settings.mutate(settingsM => {
-							settingsM.addToContextMenu = Settings.DEFAULT.addToContextMenu
-						}),
+						() => {
+							void settings.mutate(settingsM => {
+								settingsM.cmdBackspaceBehavior =
+									Settings.DEFAULT.cmdBackspaceBehavior
+							})
+						},
 						() => { this.postMutate() },
 					))
 			})
+		ui.newSetting(containerEl, setting => {
+			setting
+				.setName("Terminal AI: debug drop logging")
+				.setDesc("Log drag/drop parsing details to console when enabled.")
+				.addToggle(linkSetting(
+					() => settings.value.debugDropLogging,
+					async value => settings.mutate(settingsM => {
+						settingsM.debugDropLogging = value
+					}),
+					() => { this.postMutate() },
+				))
+				.addExtraButton(resetButton(
+					i18n.t("asset:settings.add-to-context-menu-icon"),
+					i18n.t("settings.reset"),
+					async () => settings.mutate(settingsM => {
+						settingsM.debugDropLogging =
+							Settings.DEFAULT.debugDropLogging
+					}),
+					() => { this.postMutate() },
+				))
+		})
 			.newSetting(containerEl, setting => {
 				setting
 					.setName(i18n.t("settings.profiles"))
@@ -290,6 +387,46 @@ export class SettingTab extends AdvancedSettingTab<Settings> {
 						i18n.t("settings.reset"),
 						async () => settings.mutate(settingsM => {
 							settingsM.hideStatusBar = Settings.DEFAULT.hideStatusBar
+						}),
+						() => { this.postMutate() },
+					))
+			}).newSetting(containerEl, setting => {
+				setting
+					.setName("Sync navigator reveal on file open")
+					.setDesc("Broadcast reveal commands to Make.md, Notebook Navigator, and File Explorer when opening a note.")
+					.addToggle(linkSetting(
+						() => settings.value.syncRevealOnFileOpen,
+						async value => settings.mutate(settingsM => {
+							settingsM.syncRevealOnFileOpen = value
+						}),
+						() => { this.postMutate() },
+					))
+					.addExtraButton(resetButton(
+						"rotate-ccw",
+						i18n.t("settings.reset"),
+						async () => settings.mutate(settingsM => {
+							settingsM.syncRevealOnFileOpen =
+								Settings.DEFAULT.syncRevealOnFileOpen
+						}),
+						() => { this.postMutate() },
+					))
+			}).newSetting(containerEl, setting => {
+				setting
+					.setName("Dual reveal highlight")
+					.setDesc("Show a colored stripe indicator on revealed items in the navigator for 2 seconds.")
+					.addToggle(linkSetting(
+						() => settings.value.dualRevealHighlight,
+						async value => settings.mutate(settingsM => {
+							settingsM.dualRevealHighlight = value
+						}),
+						() => { this.postMutate() },
+					))
+					.addExtraButton(resetButton(
+						"rotate-ccw",
+						i18n.t("settings.reset"),
+						async () => settings.mutate(settingsM => {
+							settingsM.dualRevealHighlight =
+								Settings.DEFAULT.dualRevealHighlight
 						}),
 						() => { this.postMutate() },
 					))

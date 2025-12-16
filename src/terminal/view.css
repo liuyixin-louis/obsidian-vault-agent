@@ -1,13 +1,79 @@
+.workspace-leaf-content[data-type=terminal\:terminal] {
+	display: flex;
+	flex-direction: column;
+	min-height: 0;
+	height: 100%;
+}
+
 .workspace-leaf-content[data-type=terminal\:terminal] .view-content {
 	overflow: clip;
 	display: flex;
 	flex-direction: column;
+	flex: 1 1 auto;
+	min-height: 0;
+	height: 100%;
 }
 
 .terminal\:terminal {
-	flex: 1;
+	flex: 1 1 auto;
+	height: 100%;
+	width: 100%;
 	min-width: 0;
 	min-height: 0;
+}
+
+.workspace-leaf-content[data-type="terminal:terminal"],
+.workspace-leaf-content[data-type="terminal"],
+.workspace-leaf-content[data-type^="terminal"] {
+	display: flex;
+	flex-direction: column;
+	min-height: 0;
+	height: 100%;
+}
+
+.workspace-leaf-content[data-type="terminal:terminal"] .view-content,
+.workspace-leaf-content[data-type="terminal"] .view-content,
+.workspace-leaf-content[data-type^="terminal"] .view-content {
+	display: flex;
+	flex-direction: column;
+	flex: 1 1 auto;
+	min-height: 0;
+	height: 100%;
+	overflow: hidden;
+}
+
+.workspace-leaf-content[data-type="terminal:terminal"] .terminal,
+.workspace-leaf-content[data-type="terminal"] .terminal,
+.workspace-leaf-content[data-type^="terminal"] .terminal,
+.workspace-leaf-content[data-type="terminal:terminal"] .xterm,
+.workspace-leaf-content[data-type="terminal"] .xterm,
+.workspace-leaf-content[data-type^="terminal"] .xterm {
+	flex: 1 1 auto;
+	min-height: 0;
+	height: 100%;
+}
+
+.workspace-leaf-content[data-type="terminal-ai:terminal"] .view-content {
+	display: flex;
+	flex-direction: column;
+	min-height: 0;
+	height: 100%;
+}
+
+.workspace-leaf-content[data-type="terminal-ai:terminal"]
+	.view-content > .terminal-ai\:terminal.node-insert-event {
+	display: flex;
+	flex: 1 1 auto;
+	min-height: 0;
+	height: 100%;
+	align-self: stretch;
+}
+
+.workspace-leaf-content[data-type="terminal-ai:terminal"]
+	.view-content > .terminal-ai\:terminal.node-insert-event > .terminal.xterm {
+	flex: 1 1 auto;
+	min-height: 0;
+	height: 100%;
 }
 
 .is-phone .workspace-leaf-content[data-type=terminal\:terminal] .view-content {

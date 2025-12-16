@@ -22,6 +22,7 @@ import {
 	deepFreeze,
 	dynamicRequire,
 	extname,
+	fixArray,
 	fixTyped,
 	instanceOf,
 	launderUnchecked,
@@ -54,6 +55,8 @@ import {
 	ItemView,
 	type Menu,
 	Scope,
+	TFile,
+	TFolder,
 	type ViewStateResult,
 	type WorkspaceLeaf,
 } from "obsidian"
@@ -75,6 +78,11 @@ import type { Unicode11Addon } from "@xterm/addon-unicode11"
 import type { WebLinksAddon } from "@xterm/addon-web-links"
 import { XtermTerminalEmulator } from "./emulator.js"
 import { writePromise } from "./util.js"
+import {
+	normalizeVaultPath,
+	resolveAbstractFile,
+	revealInExplorer,
+} from "../file-explorer.js"
 
 const
 	xtermAddonCanvas =
@@ -435,18 +443,22 @@ export class TerminalView extends ItemView {
 					icon: i18n.t("asset:commands.clear-terminal-icon"),
 					id: "clear-terminal",
 				}).id,
-				addCommand(context, () => i18n.t("commands.close-terminal"), {
-					checkCallback: withLastFocusedView((checking, view) => {
-						if (!checking) { view.leaf.detach() }
-						return true
-					}),
-					hotkeys: [{
-						key: "w",
-						modifiers: ["Mod", "Shift"],
-					}],
-					icon: i18n.t("asset:commands.close-terminal-icon"),
-					id: "close-terminal",
-				}).id,
+				addCommand(
+					context,
+					() => i18n.t("commands.close-terminal"),
+					{
+						checkCallback: withLastFocusedView((checking, view) => {
+							if (!checking) { view.leaf.detach() }
+							return true
+						}),
+						hotkeys: [{
+							key: "w",
+							modifiers: ["Mod", "Shift"],
+						}],
+						icon: i18n.t("asset:commands.close-terminal-icon"),
+						id: "close-terminal",
+					},
+				).id,
 				addCommand(context, () => i18n.t("commands.find-in-terminal"), {
 					checkCallback: withLastFocusedView((checking, view) => {
 						if (!checking) { view.startFind() }
@@ -693,7 +705,7 @@ export class TerminalView extends ItemView {
 				context,
 				context: { language: { onChangeLanguage, value: i18n }, settings },
 				leaf,
-				state: { profile, cwd, serial },
+				state: { profile, cwd, serial, initialCommands },
 				app: { workspace: { requestSaveLayout } },
 			} = this,
 			noticeSpawn = (): void => {
@@ -753,6 +765,7 @@ export class TerminalView extends ItemView {
 							xtermAddonWebLinks,
 							xtermAddonWebgl,
 						]),
+						dragAndDrop = new DragAndDropAddon(ele),
 						emulator = new TerminalView.EMULATOR(
 							ele,
 							async terminal => {
@@ -813,7 +826,7 @@ export class TerminalView extends ItemView {
 									}),
 									() => { this.find?.setResults("") },
 								),
-								dragAndDrop: new DragAndDropAddon(ele),
+								dragAndDrop,
 								ligatures: new LigaturesAddon({}),
 								renderer: new RendererAddon(
 									() => new CanvasAddon(),
@@ -835,6 +848,77 @@ export class TerminalView extends ItemView {
 						),
 						{ pseudoterminal, terminal, addons } = emulator,
 						{ disposer, renderer, search } = addons
+					const
+						openFileFromLink = (rawPath: string): void => {
+							const vaultPath = normalizeVaultPath(context, rawPath)
+							if (!vaultPath) { return }
+							const target = resolveAbstractFile(context, vaultPath)
+							if (target instanceof TFolder) {
+								void revealInExplorer(context, target, {
+									collapseIrrelevant: true,
+									center: "center",
+								})
+								return
+							}
+							if (!(target instanceof TFile)) {
+								notice2(
+									() => `File not found: ${vaultPath}`,
+									settings.value.errorNoticeTimeout,
+									context,
+								)
+								return
+							}
+							context.app.workspace.getLeaf(true).openFile(target)
+								.then(() => revealInExplorer(context, target, {
+									center: "center",
+								}))
+								.catch(error => { activeSelf(ele).console.warn(error) })
+						},
+						revealFolderFromLink = (rawPath: string): void => {
+							const vaultPath = normalizeVaultPath(context, rawPath)
+							if (!vaultPath) { return }
+							const target = resolveAbstractFile(context, vaultPath),
+								folder = target instanceof TFolder
+									? target
+									: target instanceof TFile
+										? target.parent
+										: null
+							if (!folder) {
+								notice2(
+									() => `Folder not found: ${vaultPath}`,
+									settings.value.errorNoticeTimeout,
+									context,
+								)
+								return
+							}
+							void revealInExplorer(context, folder, {
+								collapseIrrelevant: true,
+								center: "center",
+							})
+						},
+						pathLinkProvider = registerPathLinkProvider(
+							terminal,
+							openFileFromLink,
+							revealFolderFromLink,
+						)
+					disposer.push(() => { pathLinkProvider.dispose() })
+					if (initialCommands?.length) {
+						pseudoterminal.then(async pty0 => {
+							try {
+								const shell = await pty0.shell
+								if (!shell?.stdin) { return }
+								for (const cmd of initialCommands) {
+									shell.stdin.write(`${cmd}\n`)
+								}
+								this.state = {
+									...this.state,
+									initialCommands: [],
+								}
+							} catch (error) {
+								activeSelf(ele).console.warn(error)
+							}
+						}).catch(warn)
+					}
 					pseudoterminal.then(async pty0 => pty0.onExit)
 						.then(code => {
 							notice2(
@@ -858,6 +942,41 @@ export class TerminalView extends ItemView {
 					terminal.onTitleChange(title => { this.title = title })
 
 					terminal.unicode.activeVersion = "11"
+					const applyTerminalTheme = (): void => {
+						const styles = getComputedStyle(contentEl),
+							background = styles
+								.getPropertyValue("--background-primary")
+								.trim()
+								|| "#1e1e1e",
+							foreground = styles
+								.getPropertyValue("--text-normal")
+								.trim()
+								|| "#d0d0d0",
+							selection = styles
+								.getPropertyValue("--text-selection")
+								.trim()
+								|| "rgba(128, 128, 128, 0.35)"
+						terminal.options.theme = {
+							background,
+							cursor: foreground,
+							foreground,
+							selectionBackground: selection,
+						}
+					}
+					const mediaQuery =
+						contentEl.ownerDocument.defaultView
+							?.matchMedia("(prefers-color-scheme: dark)"),
+						themeObserver = new MutationObserver(applyTerminalTheme)
+					mediaQuery?.addEventListener("change", applyTerminalTheme)
+					themeObserver.observe(
+						contentEl.ownerDocument.body,
+						{ attributes: true, attributeFilter: ["class", "style"] },
+					)
+					disposer.push(
+						() => { mediaQuery?.removeEventListener("change", applyTerminalTheme) },
+						() => { themeObserver.disconnect() },
+					)
+					applyTerminalTheme()
 					disposer.push(settings.onMutate(
 						settings0 => settings0.preferredRenderer,
 						cur => { renderer.use(cur) },
@@ -915,11 +1034,13 @@ export namespace TerminalView {
 		readonly cwd: string | null
 		readonly serial: XtermTerminalEmulator.State | null
 		readonly focus: boolean
+		readonly initialCommands: readonly string[]
 	}
 	export namespace State {
 		export const DEFAULT: State = deepFreeze({
 			cwd: null,
 			focus: false,
+			initialCommands: [],
 			profile: Settings.Profile.DEFAULTS.invalid,
 			serial: null,
 		})
@@ -928,6 +1049,12 @@ export namespace TerminalView {
 			return markFixed(self0, {
 				cwd: fixTyped(DEFAULT, unc, "cwd", ["string", "null"]),
 				focus: fixTyped(DEFAULT, unc, "focus", ["boolean"]),
+				initialCommands: fixArray(
+					DEFAULT,
+					unc,
+					"initialCommands",
+					["string"],
+				),
 				profile: Settings.Profile.fix(unc.profile).value,
 				serial: unc.serial === null
 					? null
@@ -1004,4 +1131,85 @@ export namespace TerminalView {
 			type,
 		})
 	}
+}
+
+type PathLinkKind = "file" | "folder"
+interface PathLink {
+	readonly end: number
+	readonly kind: PathLinkKind
+	readonly path: string
+	readonly start: number
+}
+
+const PATH_LINK_PATTERNS = deepFreeze([
+	{ kind: "file", source: "\\bFile:\\s+(.+?)(?=$)", flags: "gu" },
+	{ kind: "folder", source: "\\bLocation:\\s+(.+?)(?=$)", flags: "gu" },
+]) satisfies readonly {
+	readonly kind: PathLinkKind
+	readonly source: string
+	readonly flags: string
+}[]
+
+function parsePathLinks(text: string): PathLink[] {
+	const links: PathLink[] = []
+	for (const { kind, source, flags } of PATH_LINK_PATTERNS) {
+		const regex = new RegExp(source, flags)
+		let match: RegExpExecArray | null = null
+		// eslint-disable-next-line no-cond-assign
+		while (match = regex.exec(text)) {
+			const raw = match[1] ?? "",
+				path = raw.trim()
+			if (!path) { continue }
+			const trimmedStart = raw.length - raw.trimStart().length,
+				startInMatch = (match[0] ?? "").indexOf(raw)
+			if (startInMatch < 0) { continue }
+			const start = (match.index ?? 0) + startInMatch + trimmedStart,
+				end = start + path.length
+			links.push({
+				end,
+				kind,
+				path,
+				start,
+			})
+		}
+	}
+	return links
+}
+
+function registerPathLinkProvider(
+	terminal: import("@xterm/xterm").Terminal,
+	onFile: (path: string) => void,
+	onFolder: (path: string) => void,
+): import("@xterm/xterm").IDisposable {
+	return terminal.registerLinkProvider({
+		provideLinks(bufferLineNumber, callback) {
+			const line = terminal.buffer.active.getLine(bufferLineNumber - 1)
+			if (!line) {
+				callback(void 0)
+				return
+			}
+			const parsed = parsePathLinks(line.translateToString(true))
+			if (!parsed.length) {
+				callback(void 0)
+				return
+			}
+			const links = parsed.map(({ end, kind, path, start }) => ({
+				range: {
+					end: { x: end, y: bufferLineNumber },
+					start: { x: start + 1, y: bufferLineNumber },
+				},
+				text: path,
+				activate(event: MouseEvent): void {
+					event.preventDefault()
+					event.stopPropagation()
+					if (kind === "file") {
+						onFile(path)
+					} else {
+						onFolder(path)
+					}
+				},
+			}))
+			callback(links)
+		},
+	})
 }

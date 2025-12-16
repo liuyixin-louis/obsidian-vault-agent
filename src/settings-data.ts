@@ -78,12 +78,17 @@ export interface Settings extends PluginContext.Settings {
 	readonly profiles: Settings.Profiles
 
 	readonly newInstanceBehavior: Settings.NewInstanceBehavior
+	readonly deleteWordKeybinding: Settings.DeleteWordKeybinding
+	readonly cmdBackspaceBehavior: Settings.CmdBackspaceBehavior
 	readonly createInstanceNearExistingOnes: boolean
+	readonly debugDropLogging: boolean
 	readonly focusOnNewInstance: boolean
 	readonly pinNewInstance: boolean
 
 	readonly openChangelogOnUpdate: boolean
 	readonly hideStatusBar: Settings.HideStatusBarOption
+	readonly syncRevealOnFileOpen: boolean
+	readonly dualRevealHighlight: boolean
 
 	readonly exposeInternalModules: boolean
 	readonly interceptLogging: boolean
@@ -105,7 +110,10 @@ export namespace Settings {
 	export const DEFAULT: Persistent = deepFreeze({
 		addToCommand: true,
 		addToContextMenu: true,
+		cmdBackspaceBehavior: "killBolAndEol",
 		createInstanceNearExistingOnes: true,
+		debugDropLogging: false,
+		deleteWordKeybinding: "ctrl-w",
 		errorNoticeTimeout: NOTICE_NO_TIMEOUT,
 		exposeInternalModules: true,
 		focusOnNewInstance: true,
@@ -127,6 +135,8 @@ export namespace Settings {
 			"win32IntegratedDefault",
 		] satisfies readonly (keyof typeof PROFILE_PRESETS)[])
 			.map(key => [key, PROFILE_PRESETS[key]])),
+		syncRevealOnFileOpen: true,
+		dualRevealHighlight: true,
 	})
 
 	export const DEFAULTABLE_LANGUAGES =
@@ -148,6 +158,13 @@ export namespace Settings {
 	export const HIDE_STATUS_BAR_OPTIONS =
 		deepFreeze(["never", "always", "focused", "running"])
 	export type HideStatusBarOption = typeof HIDE_STATUS_BAR_OPTIONS[number]
+
+	export const DELETE_WORD_KEYBINDINGS =
+		deepFreeze(["ctrl-w", "esc-del", "off"])
+	export type DeleteWordKeybinding = typeof DELETE_WORD_KEYBINDINGS[number]
+	export const CMD_BACKSPACE_BEHAVIORS =
+		deepFreeze(["killBolAndEol", "killWholeLine", "killToBol", "off"])
+	export type CmdBackspaceBehavior = typeof CMD_BACKSPACE_BEHAVIORS[number]
 
 	export const PREFERRED_RENDERER_OPTIONS = RendererAddon.RENDERER_OPTIONS
 	export type PreferredRendererOption = RendererAddon.RendererOption
@@ -1179,11 +1196,29 @@ export namespace Settings {
 				"addToContextMenu",
 				["boolean"],
 			),
+			cmdBackspaceBehavior: fixInSet(
+				DEFAULT,
+				unc,
+				"cmdBackspaceBehavior",
+				CMD_BACKSPACE_BEHAVIORS,
+			),
 			createInstanceNearExistingOnes: fixTyped(
 				DEFAULT,
 				unc,
 				"createInstanceNearExistingOnes",
 				["boolean"],
+			),
+			debugDropLogging: fixTyped(
+				DEFAULT,
+				unc,
+				"debugDropLogging",
+				["boolean"],
+			),
+			deleteWordKeybinding: fixInSet(
+				DEFAULT,
+				unc,
+				"deleteWordKeybinding",
+				DELETE_WORD_KEYBINDINGS,
 			),
 			errorNoticeTimeout: fixTyped(
 				DEFAULT,
@@ -1260,6 +1295,18 @@ export namespace Settings {
 				}
 				return cloneAsWritable(defaults2)
 			})(),
+			syncRevealOnFileOpen: fixTyped(
+				DEFAULT,
+				unc,
+				"syncRevealOnFileOpen",
+				["boolean"],
+			),
+			dualRevealHighlight: fixTyped(
+				DEFAULT,
+				unc,
+				"dualRevealHighlight",
+				["boolean"],
+			),
 		})
 	}
 }

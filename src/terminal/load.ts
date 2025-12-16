@@ -200,6 +200,12 @@ export function loadTerminal(context: TerminalPlugin): void {
 					},
 					icon: i18n.t(`asset:commands.open-terminal-${cwd}-icon`),
 					id: `open-terminal.${type}.${cwd}`,
+					hotkeys: type === "integrated" && cwd === "root"
+						? [{
+							key: "2",
+							modifiers: ["Mod", "Alt"],
+						}]
+						: [],
 				},
 			)
 		}

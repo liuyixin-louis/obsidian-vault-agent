@@ -1,5 +1,4 @@
-import { type App, Plugin, type PluginManifest } from "obsidian"
-import { EarlyPatchManager, loadPatch } from "./patch.js"
+/* eslint-disable sort-imports */
 import {
 	LanguageManager,
 	type PluginContext,
@@ -9,17 +8,30 @@ import {
 	StatusBarHider,
 	StorageSettingsManager,
 	createI18n,
+	fixArray,
 	semVerString,
 } from "@polyipseity/obsidian-plugin-library"
-import { LocalSettings, Settings } from "./settings-data.js"
-import { MAX_HISTORY, PLUGIN_UNLOAD_DELAY } from "./magic.js"
-import { DeveloperConsolePseudoterminal } from "./terminal/pseudoterminal.js"
-import { PluginLocales } from "../assets/locales.js"
 import { isNil } from "lodash-es"
+import { type App, Plugin, type PluginManifest } from "obsidian"
+import { PluginLocales } from "../assets/locales.js"
+import { loadAIContext } from "./ai-context.js"
+import { loadBacklinks } from "./backlinks-view.js"
 import { loadDocumentations } from "./documentations.js"
 import { loadIcons } from "./icons.js"
+import { MAX_HISTORY, PLUGIN_UNLOAD_DELAY } from "./magic.js"
+import { loadNewTabButton } from "./new-tab-button.js"
+import { EarlyPatchManager, loadPatch } from "./patch.js"
+import { loadRevealSync } from "./reveal-sync.js"
+import { LocalSettings, Settings } from "./settings-data.js"
 import { loadSettings } from "./settings.js"
+import { DeveloperConsolePseudoterminal } from "./terminal/pseudoterminal.js"
 import { loadTerminal } from "./terminal/load.js"
+
+// Ensure fixArray exists at runtime even if the bundler drops the import.
+const selfRecord = self as unknown as Record<string, unknown>
+if (typeof selfRecord["fixArray"] === "undefined") {
+	selfRecord["fixArray"] = fixArray
+}
 
 export class TerminalPlugin
 	extends Plugin
@@ -115,7 +127,11 @@ export class TerminalPlugin
 					Promise.resolve().then(() => {
 						loadSettings(this, loadDocumentations(this, isNil(loaded)))
 					}),
+					Promise.resolve().then(() => { loadNewTabButton(this) }),
+					Promise.resolve().then(() => { loadRevealSync(this) }),
 					Promise.resolve().then(() => { loadTerminal(this) }),
+					Promise.resolve().then(() => { loadAIContext(this) }),
+					Promise.resolve().then(() => { loadBacklinks(this) }),
 					Promise.resolve().then(() => {
 						this.register(settings.onMutate(
 							settings0 => settings0.hideStatusBar,

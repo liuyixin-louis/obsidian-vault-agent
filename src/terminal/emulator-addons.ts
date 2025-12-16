@@ -1,3 +1,4 @@
+/* eslint-disable sort-imports */
 import {
 	Functions,
 	activeSelf,
@@ -6,9 +7,9 @@ import {
 	isNonNil,
 	replaceAllRegex,
 } from "@polyipseity/obsidian-plugin-library"
-import type { ITerminalAddon, Terminal } from "@xterm/xterm"
 import type { CanvasAddon } from "@xterm/addon-canvas"
 import type { WebglAddon } from "@xterm/addon-webgl"
+import type { ITerminalAddon, Terminal } from "@xterm/xterm"
 import { constant } from "lodash-es"
 
 export class DisposerAddon extends Functions implements ITerminalAddon {
