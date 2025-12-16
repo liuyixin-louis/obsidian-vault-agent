@@ -1,26 +1,33 @@
-# Terminal AI for Obsidian (fork) [![release](https://img.shields.io/github/v/release/polyipseity/obsidian-terminal)][latest release] [![Python](https://img.shields.io/badge/Python-≥3.10-gold?labelColor=blue&logo=Python&logoColor=white)][Python]
+# Terminal AI for Obsidian
 
-[Buy Me a Coffee]: https://buymeacoffee.com/polyipseity
-[Buy Me a Coffee/embed]: https://img.buymeacoffee.com/button-api/?text=Buy%20me%20a%20coffee&emoji=&slug=polyipseity&button_colour=40DCA5&font_colour=ffffff&font_family=Lato&outline_colour=000000&coffee_colour=FFDD00
 [Obsidian]: https://obsidian.md/
 [Python]: https://python.org/downloads/
-[changelog]: https://github.com/polyipseity/obsidian-terminal/blob/main/CHANGELOG.md
-[community plugin]: https://obsidian.md/plugins?id=terminal
-[latest release]: https://github.com/polyipseity/obsidian-terminal/releases/latest
-[repository]: https://github.com/polyipseity/obsidian-terminal
-[trailer]: https://raw.githubusercontent.com/polyipseity/obsidian-terminal/main/assets/trailer.png
+[changelog]: https://github.com/liuyixin-louis/obsidian-terminal-ai/blob/main/CHANGELOG.md
+[original]: https://github.com/polyipseity/obsidian-terminal
 [claude-demo]: assets/claude-terminal-demo.png
-Integrate consoles, shells, and terminals inside [Obsidian].
 
-[![Buy Me a Coffee/embed]][Buy Me a Coffee]
-
-__[Repository] · [Changelog] · [Features](#features) · [Installation](#installation) · [Usage](#usage) · [Contributing](#contributing) · [Security](#security)__
+Integrate consoles, shells, and terminals inside [Obsidian] — **enhanced for AI coding agents**.
 
 ![Claude Code in Obsidian Terminal][claude-demo]
 
-For first time users, read the [installation](#installation) section first!
+> A fork of [obsidian-terminal][original] with AI-focused enhancements for seamless integration with Claude Code, Cursor, and other AI coding tools.
 
-This fork is renamed (`id: terminal-ai`) to avoid conflicts with the official Terminal plugin. Install it into `.obsidian/plugins/terminal-ai`.
+## What's New (vs Original)
+
+| Feature | Description |
+|---------|-------------|
+| **AI Context Sync** | Automatically exports active file/folder paths to `.obsidian/ai-context.json` for AI agents to consume |
+| **Drag & Drop Files** | Drop files/folders onto the terminal to instantly paste their paths |
+| **Backlinks Panel** | View and navigate backlinks directly from the terminal view |
+| **Reveal Sync** | Bidirectional sync between file explorer and editor — click a file, terminal follows |
+| **Dual Highlight** | Visual highlighting when navigating between linked notes |
+| **New Tab Button** | Quick access button for opening new terminal tabs |
+
+This fork is renamed (`id: terminal-ai`) to avoid conflicts with the official Terminal plugin.
+
+__[Changelog] · [Features](#features) · [Installation](#installation) · [Usage](#usage) · [Contributing](#contributing)__
+
+For first time users, read the [installation](#installation) section first!
 
 ## Features
 
