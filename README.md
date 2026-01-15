@@ -10,9 +10,6 @@ Integrate consoles, shells, and terminals inside [Obsidian] — **enhanced for A
 
 ![Claude Code in Obsidian Terminal](assets/demo-img.png)
 
-
-> A fork of [obsidian-terminal][original] with AI-focused enhancements for seamless integration with Claude Code, Cursor, and other AI coding tools.
-
 ## What's New (vs Original)
 
 | Feature | Description |
@@ -23,8 +20,6 @@ Integrate consoles, shells, and terminals inside [Obsidian] — **enhanced for A
 | **Reveal Sync** | Bidirectional sync between file explorer and editor — click a file, terminal follows |
 | **Dual Highlight** | Visual highlighting when navigating between linked notes |
 | **New Tab Button** | Quick access button for opening new terminal tabs |
-
-This fork is renamed (`id: terminal-ai`) to avoid conflicts with the official Terminal plugin.
 
 __[Changelog] · [Features](#features) · [Installation](#installation) · [Usage](#usage) · [Contributing](#contributing)__
 
@@ -252,3 +247,9 @@ We hope that there will never be any security vulnerabilities, but unfortunately
 ### Reporting a vulnerability
 
 Please report a vulnerability by [opening a new issue](https://github.com/liuyixin-louis/obsidian-vault-agent/issues/new). We will get back to you as soon as possible.
+
+---
+
+> A fork of [obsidian-terminal][original] with AI-focused enhancements for seamless integration with Claude Code, Cursor, and other AI coding tools.
+
+This fork is renamed (`id: terminal-ai`) to avoid conflicts with the official Terminal plugin.
