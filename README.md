@@ -253,3 +253,5 @@ Please report a vulnerability by [opening a new issue](https://github.com/liuyix
 > A fork of [obsidian-terminal][original] with AI-focused enhancements for seamless integration with Claude Code, Cursor, and other AI coding tools.
 
 This fork is renamed (`id: terminal-ai`) to avoid conflicts with the official Terminal plugin.
+
+Maintained by [Yixin Liu](https://github.com/liuyixin-louis).
