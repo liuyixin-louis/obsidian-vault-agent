@@ -18,9 +18,9 @@ Integrate consoles, shells, and terminals inside [Obsidian] — **enhanced for A
 |---------|-------------|
 | **AI Context Sync** | Automatically exports active file/folder paths to `.obsidian/ai-context.json` for AI agents to consume |
 | **Drag & Drop Files** | Drop files/folders onto the terminal to instantly paste their paths |
-| **Backlinks Panel** | View and navigate backlinks directly from the terminal view |
-| **Reveal Sync** | Bidirectional sync between file explorer and editor — click a file, terminal follows |
-| **Dual Highlight** | Visual highlighting when navigating between linked notes |
+<!-- | **Backlinks Panel** | View and navigate backlinks directly from the terminal view | -->
+<!-- | **Reveal Sync** | Bidirectional sync between file explorer and editor — click a file, terminal follows | -->
+<!-- | **Dual Highlight** | Visual highlighting when navigating between linked notes | -->
 | **New Tab Button** | Quick access button for opening new terminal tabs |
 
 
