@@ -123,6 +123,13 @@ If you are primarily looking for a chat-based AI assistant inside Obsidian, othe
 - Drag & drop: dropping files/folders onto the terminal pastes their paths into the terminal.
 - Both helpers use the vault root from the Obsidian file system adapter; when no changes are detected, files are not rewritten.
 
+<!-- entry point of both claude code and codex agent -->
+<!-- /Users/yixinliu/workspace/kobo-note-agent-terminal/obsidian-terminal/assets/entry-buttons.png -->
+### Entry points  
+
+![Entry points](assets/entry-buttons.png)
+
+
 ### Keyboard shortcuts
 
 The keyboard shortcuts can be customized in hotkeys settings.
