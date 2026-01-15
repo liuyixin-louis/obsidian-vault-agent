@@ -198,6 +198,8 @@ In the developer console, a context variable `$$` is passed into the code, which
 
 The full API is available from [`src/@types/obsidian-terminal.ts`](src/%40types/obsidian-terminal.ts).
 
+This fork is renamed (`id: terminal-ai`) to avoid conflicts with the official Terminal plugin.
+
 ### Troubleshooting
 
 - Is the plugin useful on mobile?
@@ -251,10 +253,7 @@ We hope that there will never be any security vulnerabilities, but unfortunately
 
 Please report a vulnerability by [opening a new issue](https://github.com/liuyixin-louis/obsidian-vault-agent/issues/new). We will get back to you as soon as possible.
 
----
 
-> A fork of [obsidian-terminal][original] with AI-focused enhancements for seamless integration with Claude Code, Cursor, and other AI coding tools.
 
-This fork is renamed (`id: terminal-ai`) to avoid conflicts with the official Terminal plugin.
 
 Maintained by [Yixin Liu](https://github.com/liuyixin-louis).
