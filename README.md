@@ -1,6 +1,6 @@
 # 📖 Obsidian Vault Agent
 
-> A fork of [obsidian-terminal][original] with AI-focused enhancements for seamless integration with Claude Code, Cursor, and other AI coding tools.
+> A fork of [obsidian-terminal][original] with AI-focused enhancements for seamless integration with Claude Code, Codex, and other AI coding tools.
 
 [Obsidian]: https://obsidian.md/
 [Python]: https://python.org/downloads/
