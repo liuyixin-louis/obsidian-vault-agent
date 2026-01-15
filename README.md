@@ -1,4 +1,4 @@
-# Obsidian Vault Agent
+# 📖 Obsidian Vault Agent
 
 [Obsidian]: https://obsidian.md/
 [Python]: https://python.org/downloads/
