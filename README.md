@@ -8,7 +8,7 @@
 
 Integrate consoles, shells, and terminals inside [Obsidian] — **enhanced for AI coding agents**.
 
-![Claude Code in Obsidian Terminal](assets/demo-image.png)
+![Claude Code in Obsidian Terminal](assets/demo-img.png)
 
 
 > A fork of [obsidian-terminal][original] with AI-focused enhancements for seamless integration with Claude Code, Cursor, and other AI coding tools.
