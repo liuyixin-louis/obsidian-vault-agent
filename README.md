@@ -21,6 +21,8 @@ Integrate consoles, shells, and terminals inside [Obsidian] — **enhanced for A
 | **Dual Highlight** | Visual highlighting when navigating between linked notes |
 | **New Tab Button** | Quick access button for opening new terminal tabs |
 
+> A fork of [obsidian-terminal][original] with AI-focused enhancements for seamless integration with Claude Code, Cursor, and other AI coding tools.
+
 __[Changelog] · [Features](#features) · [Installation](#installation) · [Usage](#usage) · [Contributing](#contributing)__
 
 For first time users, read the [installation](#installation) section first!
