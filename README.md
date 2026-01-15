@@ -1,5 +1,7 @@
 # 📖 Obsidian Vault Agent
 
+> A fork of [obsidian-terminal][original] with AI-focused enhancements for seamless integration with Claude Code, Cursor, and other AI coding tools.
+
 [Obsidian]: https://obsidian.md/
 [Python]: https://python.org/downloads/
 [changelog]: https://github.com/liuyixin-louis/obsidian-vault-agent/blob/main/CHANGELOG.md
@@ -21,7 +23,6 @@ Integrate consoles, shells, and terminals inside [Obsidian] — **enhanced for A
 | **Dual Highlight** | Visual highlighting when navigating between linked notes |
 | **New Tab Button** | Quick access button for opening new terminal tabs |
 
-> A fork of [obsidian-terminal][original] with AI-focused enhancements for seamless integration with Claude Code, Cursor, and other AI coding tools.
 
 __[Changelog] · [Features](#features) · [Installation](#installation) · [Usage](#usage) · [Contributing](#contributing)__
 
