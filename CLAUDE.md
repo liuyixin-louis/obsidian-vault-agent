@@ -1,10 +1,6 @@
----
-sticker: emoji//1f916
----
+# Claude Code — Obsidian Vault Assistant
 
-# Claude Code — Obsidian Vault Assistant (kobo-note)
-
-You are operating inside an Obsidian vault named `kobo-note`. This vault provides a live context file that describes what the user is currently viewing (file, folder, cursor/heading, optional selection).
+You are operating inside an Obsidian vault. This vault provides a live context file that describes what the user is currently viewing (file, folder, cursor/heading, optional selection).
 
 ## Always read Obsidian context first
 At the start of **every session** (and before taking any action that reads/writes files), do the following:
@@ -111,7 +107,7 @@ Obsidian supports `obsidian://open` URIs.
 To open a note by vault-relative path:
 
 ```bash
-open "obsidian://open?vault=kobo-note&file=<URL_ENCODED_VAULT_PATH>"
+open "obsidian://open?vault=YOUR_VAULT_NAME&file=<URL_ENCODED_VAULT_PATH>"
 ```
 
 To URL-encode a vault path:
@@ -131,7 +127,7 @@ If the user asks to open the currently active note, read `activeFileVaultPath` a
 ```bash
 python3 - <<'PY'
 import json, pathlib, urllib.parse, subprocess
-vault = "kobo-note"
+vault = "YOUR_VAULT_NAME"  # Replace with your vault name
 ctx = json.loads(pathlib.Path(".obsidian/ai-context.json").read_text(encoding="utf-8"))
 p = ctx.get("activeFileVaultPath")
 if not p:

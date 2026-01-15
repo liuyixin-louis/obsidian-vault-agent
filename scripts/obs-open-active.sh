@@ -1,15 +1,15 @@
 #!/usr/bin/env bash
 set -euo pipefail
 # Open the active file from .obsidian/ai-context.json in Obsidian via obsidian://open
-# Usage: VAULT_NAME="kobo-note" scripts/obs-open-active.sh [path-to-ai-context.json]
+# Usage: VAULT_NAME="your-vault" scripts/obs-open-active.sh [path-to-ai-context.json]
 
-VAULT_NAME="${VAULT_NAME:-kobo-note}"
+VAULT_NAME="${VAULT_NAME:?Please set VAULT_NAME environment variable}"
 CONTEXT_PATH="${1:-.obsidian/ai-context.json}"
 
 uri="$(python3 - <<'PY'
 import json, urllib.parse, pathlib, os, sys
 
-vault = os.environ.get("VAULT_NAME", "kobo-note")
+vault = os.environ["VAULT_NAME"]
 ctx_path = pathlib.Path(sys.argv[1])
 data = json.loads(ctx_path.read_text())
 path = data.get("activeFileVaultPath")

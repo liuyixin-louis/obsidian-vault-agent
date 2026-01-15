@@ -254,8 +254,9 @@ export class TerminalView extends ItemView {
 	public static readonly type =
 		new UnnamespacedID(DOMClasses2.Namespaced.TERMINAL)
 
-	protected static lastFocusTimes = new Map<TerminalView, number>()
-	protected static readonly focusedScope = new Scope()
+protected static lastFocusTimes = new Map<TerminalView, number>()
+protected static readonly focusedScope = new Scope()
+protected static lastNonTerminalLeaf: WorkspaceLeaf | null = null
 
 	static #namespacedType: string
 	#title0 = ""
@@ -379,6 +380,16 @@ export class TerminalView extends ItemView {
 			TerminalView.type.namespaced(context),
 			leaf => new TerminalView(context, leaf),
 		)
+		context.registerEvent(context.app.workspace.on(
+			"active-leaf-change",
+			leaf => {
+				if (!leaf) { return }
+				const viewType = leaf.view?.getViewType?.()
+				if (viewType && viewType !== this.#namespacedType) {
+					this.lastNonTerminalLeaf = leaf
+				}
+			},
+		))
 
 		const withLastFocusedView = (
 			callback: (checking: boolean, view: TerminalView) => boolean,
@@ -401,6 +412,50 @@ export class TerminalView extends ItemView {
 			// No hotkeys: hotkeys: [],
 			icon: i18n.t("asset:commands.focus-on-last-terminal-icon"),
 			id: "focus-on-last-terminal",
+		})
+		addCommand(context, () => i18n.t("commands.go-to-left-tab"), {
+			callback(): void {
+				const { workspace } = context.app,
+					activeLeaf = workspace.activeLeaf
+				if (!activeLeaf) { return }
+				const parent = (activeLeaf as WorkspaceLeaf & {
+					parent?: { children?: WorkspaceLeaf[] }
+				}).parent
+				const children = parent?.children
+				if (!children) { return }
+				const index = children.indexOf(activeLeaf)
+				if (index > 0) {
+					workspace.setActiveLeaf(children[index - 1] as WorkspaceLeaf, { focus: true })
+				}
+			},
+			hotkeys: [{
+				key: "ArrowLeft",
+				modifiers: ["Alt", "Mod"],
+			}],
+			icon: i18n.t("asset:commands.go-to-left-tab-icon"),
+			id: "go-to-left-tab",
+		})
+		addCommand(context, () => i18n.t("commands.go-to-right-tab"), {
+			callback(): void {
+				const { workspace } = context.app,
+					activeLeaf = workspace.activeLeaf
+				if (!activeLeaf) { return }
+				const parent = (activeLeaf as WorkspaceLeaf & {
+					parent?: { children?: WorkspaceLeaf[] }
+				}).parent
+				const children = parent?.children
+				if (!children) { return }
+				const index = children.indexOf(activeLeaf)
+				if (index >= 0 && index < children.length - 1) {
+					workspace.setActiveLeaf(children[index + 1] as WorkspaceLeaf, { focus: true })
+				}
+			},
+			hotkeys: [{
+				key: "ArrowRight",
+				modifiers: ["Alt", "Mod"],
+			}],
+			icon: i18n.t("asset:commands.go-to-right-tab-icon"),
+			id: "go-to-right-tab",
 		})
 		const focusedScopeIDs = new Set([
 				addCommand(
@@ -603,6 +658,24 @@ export class TerminalView extends ItemView {
 			instanceOf(activeElement, SVGElement)) {
 			activeElement.blur()
 		}
+	}
+
+	protected createNewTerminalTab(): void {
+		const { context } = this
+		const nextState: TerminalView.State = {
+			...this.state,
+			focus: context.settings.value.focusOnNewInstance,
+			initialCommands: [],
+			serial: null,
+		}
+		void TerminalView.spawn(
+			context,
+			nextState,
+			TerminalView.getLeaf(context, this.leaf),
+			this.getViewType(),
+		).catch(error => {
+			activeSelf(this.contentEl).console.error(error)
+		})
 	}
 
 	protected override async onOpen(): Promise<void> {
@@ -849,6 +922,10 @@ export class TerminalView extends ItemView {
 						{ pseudoterminal, terminal, addons } = emulator,
 						{ disposer, renderer, search } = addons
 					const
+						isModKey = (evt: KeyboardEvent): boolean =>
+							evt.metaKey || evt.ctrlKey,
+						keyLower = (evt: KeyboardEvent): string =>
+							(evt.key ?? "").toLowerCase(),
 						openFileFromLink = (rawPath: string): void => {
 							const vaultPath = normalizeVaultPath(context, rawPath)
 							if (!vaultPath) { return }
@@ -902,6 +979,91 @@ export class TerminalView extends ItemView {
 							revealFolderFromLink,
 						)
 					disposer.push(() => { pathLinkProvider.dispose() })
+					const isAppHotkey = (evt: KeyboardEvent): boolean =>
+						Platform.CURRENT === "darwin" && evt.metaKey,
+						focusObsidianLeaf = (): void => {
+							const { workspace } = this.app,
+								isTerminalLeaf = (leaf: WorkspaceLeaf | null): boolean =>
+									Boolean(leaf?.view?.getViewType?.() === TerminalView.#namespacedType)
+							let target = TerminalView.lastNonTerminalLeaf
+							if (!target || target === this.leaf || isTerminalLeaf(target)) {
+								const recent = workspace.getMostRecentLeaf()
+								if (recent && recent !== this.leaf && !isTerminalLeaf(recent)) {
+									target = recent
+								} else {
+									let fallback: WorkspaceLeaf | null = null
+									workspace.iterateAllLeaves(leaf => {
+										if (fallback) { return }
+										if (leaf !== this.leaf && !isTerminalLeaf(leaf)) {
+											fallback = leaf
+										}
+									})
+									target = fallback
+								}
+							}
+							if (target) {
+								workspace.setActiveLeaf(target, { focus: true })
+							} else {
+								this.unfocus()
+							}
+						}
+					// Keep Cmd+T / Cmd+P working inside the terminal pane.
+					terminal.attachCustomKeyEventHandler(evt => {
+						if (!evt.metaKey && !evt.ctrlKey && evt.key === "Escape") {
+							evt.preventDefault()
+							evt.stopPropagation()
+							;(evt as any).stopImmediatePropagation?.()
+							focusObsidianLeaf()
+							return false
+						}
+						if (isAppHotkey(evt)) {
+							const key = keyLower(evt)
+							if (key === "t") {
+								evt.preventDefault()
+								evt.stopPropagation()
+								;(evt as any).stopImmediatePropagation?.()
+								Promise.resolve().then(() => { this.createNewTerminalTab() })
+								return false
+							}
+							if (key === "p") {
+								evt.preventDefault()
+								evt.stopPropagation()
+								;(evt as any).stopImmediatePropagation?.()
+								Promise.resolve().then(() => {
+									const appWithCommands = this.app as typeof this.app & {
+										commands: { executeCommandById: (id: string) => void }
+									}
+									appWithCommands.commands
+										.executeCommandById("command-palette:open")
+								})
+								return false
+							}
+							// Let Obsidian hotkeys run when Cmd is held.
+							return false
+						}
+						if (!isModKey(evt)) { return true }
+						const key = keyLower(evt)
+						if (key === "t") {
+							evt.preventDefault()
+							evt.stopPropagation()
+							;(evt as any).stopImmediatePropagation?.()
+							Promise.resolve().then(() => { this.createNewTerminalTab() })
+							return false
+						}
+						if (key === "p") {
+							evt.preventDefault()
+							evt.stopPropagation()
+							;(evt as any).stopImmediatePropagation?.()
+							Promise.resolve().then(() => {
+								const appWithCommands = this.app as typeof this.app & {
+									commands: { executeCommandById: (id: string) => void }
+								}
+								appWithCommands.commands.executeCommandById("command-palette:open")
+							})
+							return false
+						}
+						return true
+					})
 					if (initialCommands?.length) {
 						pseudoterminal.then(async pty0 => {
 							try {
@@ -1120,7 +1282,8 @@ export namespace TerminalView {
 		leaf?: WorkspaceLeaf,
 		type: string = TerminalView.type.namespaced(context),
 	): Promise<void> {
-		await (leaf ?? getLeaf(context)).setViewState({
+		const targetLeaf = leaf ?? getLeaf(context)
+		await targetLeaf.setViewState({
 			active: true,
 			state: newCollaborativeState(context, new Map([
 				[
@@ -1130,6 +1293,8 @@ export namespace TerminalView {
 			])),
 			type,
 		})
+		// Pin after the view is created so file-open won't reuse this leaf.
+		targetLeaf.setPinned?.(context.settings.value.pinNewInstance)
 	}
 }
 

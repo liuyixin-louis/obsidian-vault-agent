@@ -2,11 +2,8 @@ import {
 	type AwaitResources,
 	LibraryLocales,
 	mergeResources,
-	syncLocale,
 	typedKeys,
 } from "@polyipseity/obsidian-plugin-library"
-import type en from "./locales/en/translation.json"
-
 export namespace PluginLocales {
 	export const {
 		DEFAULT_LANGUAGE,
@@ -15,7 +12,7 @@ export namespace PluginLocales {
 		FORMATTERS,
 		RETURN_NULL,
 	} = LibraryLocales
-	const sync = syncLocale<typeof en>()
+	const sync = <Actual>(locale: Actual): Actual => locale
 	export const RESOURCES = mergeResources(LibraryLocales.RESOURCES, {
 		af: {
 			[DEFAULT_NAMESPACE]: async () =>

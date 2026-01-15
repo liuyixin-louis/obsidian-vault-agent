@@ -1,16 +1,16 @@
 #!/usr/bin/env bash
 set -euo pipefail
 # Close the active file tab via Advanced URI (requires Advanced URI plugin).
-# Usage: VAULT_NAME="kobo-note" scripts/obs-close-active.sh [path-to-ai-context.json]
+# Usage: VAULT_NAME="your-vault" scripts/obs-close-active.sh [path-to-ai-context.json]
 # On Linux, you may need to double-encode the entire URI before xdg-open.
 
-VAULT_NAME="${VAULT_NAME:-kobo-note}"
+VAULT_NAME="${VAULT_NAME:?Please set VAULT_NAME environment variable}"
 CONTEXT_PATH="${1:-.obsidian/ai-context.json}"
 
 uri="$(python3 - <<'PY'
 import json, urllib.parse, pathlib, os, sys
 
-vault = os.environ.get("VAULT_NAME", "kobo-note")
+vault = os.environ["VAULT_NAME"]
 ctx_path = pathlib.Path(sys.argv[1])
 data = json.loads(ctx_path.read_text())
 path = data.get("activeFileVaultPath")

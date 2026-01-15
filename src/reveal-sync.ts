@@ -92,16 +92,22 @@ export function loadRevealSync(context: TerminalPlugin): void {
 			return true
 		}
 
+	// Disabled: auto-reveal on file-open (page change) is no longer needed.
+	/*
 	context.registerEvent(app.workspace.on("file-open", file => {
 		if (!settings.value.syncRevealOnFileOpen) { return }
 		revealInAllNavigators(file)
 	}))
+	*/
+	// Disabled: auto-reveal on file create is no longer needed.
+	/*
 	context.registerEvent(app.vault.on("create", file => {
 		if (!settings.value.syncRevealOnFileOpen) { return }
 		if (!(file instanceof TFile)) { return }
 		if (app.workspace.getActiveFile()?.path !== file.path) { return }
 		revealInAllNavigators(file, { force: true })
 	}))
+	*/
 	context.register(settings.onMutate(
 		settings0 => settings0.syncRevealOnFileOpen,
 		enabled => { if (enabled) { lastRevealedPath = null } },

@@ -1,4 +1,4 @@
-# Codex Agent Instructions — Obsidian vault (kobo-note)
+# Codex Agent Instructions — Obsidian Vault
 
 You are working inside an Obsidian vault on macOS. This vault provides live context in `.obsidian/ai-context.json` describing the active note, folder, and cursor/selection so you can target the correct section and insertion point.
 
@@ -77,7 +77,7 @@ Do NOT auto-open notes. Only open/show in Obsidian if the user explicitly asks.
 To open a note by vault-relative path (macOS):
 
 ```bash
-open "obsidian://open?vault=kobo-note&file=<URL_ENCODED_VAULT_PATH>"
+open "obsidian://open?vault=YOUR_VAULT_NAME&file=<URL_ENCODED_VAULT_PATH>"
 ```
 
 To open the current active note (uses `activeFileVaultPath`):
@@ -85,7 +85,7 @@ To open the current active note (uses `activeFileVaultPath`):
 ```bash
 python3 - <<'PY'
 import json, pathlib, urllib.parse, subprocess
-vault="kobo-note"
+vault="YOUR_VAULT_NAME"  # Replace with your vault name
 ctx=json.loads(pathlib.Path(".obsidian/ai-context.json").read_text(encoding="utf-8"))
 p=ctx.get("activeFileVaultPath")
 if not p:
@@ -104,5 +104,6 @@ PY
 ## Communication
 
 - If uncertain about target file/section, re-read `.obsidian/ai-context.json` and proceed with the priority: selection → current heading → whole note.
+- If `.obsidian/ai-context.json` is missing, use a short message (e.g., "No ai-context.json found; please open Obsidian or specify a target file.") and avoid repeating the full error sentence.
 - Prefer small, reviewable diffs.
 - For placement tasks: prefer proposing options and asking the user rather than scanning the entire vault.

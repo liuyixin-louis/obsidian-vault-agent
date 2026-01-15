@@ -4,6 +4,8 @@
 		"close-terminal-icon": "$t(asset:generic.actions.close-icon)",
 		"find-in-terminal-icon": "$t(asset:generic.actions.find-icon)",
 		"focus-on-last-terminal-icon": "$t(asset:generic.actions.focus-icon)",
+		"go-to-left-tab-icon": "arrow-left",
+		"go-to-right-tab-icon": "arrow-right",
 		"open-developer-console-icon": "$t(asset:generic.profile-types.developerConsole-icon)",
 		"open-documentation-changelog-icon": "$t(asset:generic.documentations.changelog-icon)",
 		"open-documentation-donate-icon": "$t(asset:generic.documentations.donate-icon)",

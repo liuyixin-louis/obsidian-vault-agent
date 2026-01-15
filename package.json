@@ -1,7 +1,7 @@
 {
-	"author": "polyipseity",
+	"author": "Yixin Liu",
 	"bugs": {
-		"url": "https://github.com/polyipseity/PLACEHOLDER"
+		"url": "https://github.com/liuyixin-louis/obsidian-vault-agent/issues"
 	},
 	"dependencies": {
 		"@polyipseity/obsidian-plugin-library": "^1.33.0",
@@ -31,7 +31,7 @@
 		"tmp-promise": "^3.0.3",
 		"ts-essentials": "^10.1.1"
 	},
-	"description": "Integrate consoles, shells, and terminals.",
+	"description": "Terminal integration for Obsidian with AI coding agent support (Claude Code, Cursor, etc.).",
 	"devDependencies": {
 		"@changesets/cli": "^2.29.7",
 		"@eslint/compat": "^1.3.2",
@@ -71,15 +71,11 @@
 	],
 	"funding": [
 		{
-			"type": "Buy Me a Coffee",
-			"url": "https://buymeacoffee.com/polyipseity"
-		},
-		{
 			"type": "GitHub Sponsors",
-			"url": "https://github.com/sponsors/polyipseity"
+			"url": "https://github.com/sponsors/liuyixin-louis"
 		}
 	],
-	"homepage": "https://github.com/polyipseity/PLACEHOLDER#readme",
+	"homepage": "https://github.com/liuyixin-louis/obsidian-vault-agent#readme",
 	"keywords": [
 		"console",
 		"console-emulator",
@@ -93,13 +89,13 @@
 	],
 	"license": "AGPL-3.0-or-later",
 	"main": "main.js",
-	"name": "obsidian-terminal-ai",
+	"name": "obsidian-vault-agent",
 	"obsidian": {
-		"authorUrl": "https://github.com/polyipseity",
+		"authorUrl": "https://github.com/liuyixin-louis",
 		"id": "terminal-ai",
 		"isDesktopOnly": false,
 		"minAppVersion": "1.4.11",
-		"name": "Terminal AI"
+		"name": "Obsidian Vault Agent"
 	},
 	"overrides": {
 		"tmp": "^0.2.5"
@@ -112,14 +108,15 @@
 	"private": true,
 	"repository": {
 		"type": "git",
-		"url": "git+https://github.com/polyipseity/PLACEHOLDER.git"
+		"url": "git+https://github.com/liuyixin-louis/obsidian-vault-agent.git"
 	},
 	"scripts": {
 		"build": "npm run check && npm run build:force",
 		"build:force": "node build/build.mjs",
-		"check": "tsc --noEmit && eslint --cache .",
+		"check": "tsc --noEmit",
 		"dev": "npm run build:force -- dev",
 		"fix": "eslint --fix --cache .",
+		"lint": "eslint --cache .",
 		"obsidian:install": "npm run build && node build/obsidian-install.mjs",
 		"obsidian:install:force": "npm run build:force && node build/obsidian-install.mjs",
 		"postversion": "node build/version-post.mjs",

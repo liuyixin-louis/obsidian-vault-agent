@@ -89,6 +89,7 @@ export interface Settings extends PluginContext.Settings {
 	readonly hideStatusBar: Settings.HideStatusBarOption
 	readonly syncRevealOnFileOpen: boolean
 	readonly dualRevealHighlight: boolean
+	readonly autoOpenTyporaOnFileOpen: boolean
 
 	readonly exposeInternalModules: boolean
 	readonly interceptLogging: boolean
@@ -135,8 +136,9 @@ export namespace Settings {
 			"win32IntegratedDefault",
 		] satisfies readonly (keyof typeof PROFILE_PRESETS)[])
 			.map(key => [key, PROFILE_PRESETS[key]])),
-		syncRevealOnFileOpen: true,
+		syncRevealOnFileOpen: false,
 		dualRevealHighlight: true,
+		autoOpenTyporaOnFileOpen: true,
 	})
 
 	export const DEFAULTABLE_LANGUAGES =
@@ -1305,6 +1307,12 @@ export namespace Settings {
 				DEFAULT,
 				unc,
 				"dualRevealHighlight",
+				["boolean"],
+			),
+			autoOpenTyporaOnFileOpen: fixTyped(
+				DEFAULT,
+				unc,
+				"autoOpenTyporaOnFileOpen",
 				["boolean"],
 			),
 		})

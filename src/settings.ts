@@ -430,6 +430,26 @@ export class SettingTab extends AdvancedSettingTab<Settings> {
 						}),
 						() => { this.postMutate() },
 					))
+			}).newSetting(containerEl, setting => {
+				setting
+					.setName("Auto open in Typora on file open")
+					.setDesc("Open the active markdown note in Typora when switching notes.")
+					.addToggle(linkSetting(
+						() => settings.value.autoOpenTyporaOnFileOpen,
+						async value => settings.mutate(settingsM => {
+							settingsM.autoOpenTyporaOnFileOpen = value
+						}),
+						() => { this.postMutate() },
+					))
+					.addExtraButton(resetButton(
+						"rotate-ccw",
+						i18n.t("settings.reset"),
+						async () => settings.mutate(settingsM => {
+							settingsM.autoOpenTyporaOnFileOpen =
+								Settings.DEFAULT.autoOpenTyporaOnFileOpen
+						}),
+						() => { this.postMutate() },
+					))
 			})
 		this.newNoticeTimeoutWidget(Settings.DEFAULT)
 		this.newSectionWidget(() => i18n.t("settings.advanced"))

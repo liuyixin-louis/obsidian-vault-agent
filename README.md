@@ -1,14 +1,15 @@
-# Terminal AI for Obsidian
+# Obsidian Vault Agent
 
 [Obsidian]: https://obsidian.md/
 [Python]: https://python.org/downloads/
-[changelog]: https://github.com/liuyixin-louis/obsidian-terminal-ai/blob/main/CHANGELOG.md
+[changelog]: https://github.com/liuyixin-louis/obsidian-vault-agent/blob/main/CHANGELOG.md
 [original]: https://github.com/polyipseity/obsidian-terminal
-[claude-demo]: assets/claude-terminal-demo.png
+[latest release]: https://github.com/liuyixin-louis/obsidian-vault-agent/releases/latest
 
 Integrate consoles, shells, and terminals inside [Obsidian] — **enhanced for AI coding agents**.
 
-![Claude Code in Obsidian Terminal][claude-demo]
+![Claude Code in Obsidian Terminal](assets/demo-image.png)
+
 
 > A fork of [obsidian-terminal][original] with AI-focused enhancements for seamless integration with Claude Code, Cursor, and other AI coding tools.
 
@@ -29,6 +30,14 @@ __[Changelog] · [Features](#features) · [Installation](#installation) · [Usag
 
 For first time users, read the [installation](#installation) section first!
 
+## Agent-Aware Execution
+
+Obsidian Vault Agent treats terminals as **execution surfaces for AI agents**, not just shells.
+
+It provides lightweight but reliable primitives for synchronizing vault context, paths, and navigation state with external coding agents such as Claude Code and Cursor.
+
+This allows agents to operate *inside* your workspace with awareness of notes, files, and structure — without introducing a separate chat-first UI.
+
 ## Features
 
 - Start external terminals from Obsidian.
@@ -42,21 +51,32 @@ For first time users, read the [installation](#installation) section first!
 - Customize terminal appearance.
 - Push AI context + drag/drop helper files for agents.
 
+## Why not X?
+
+There are several excellent projects exploring AI + Obsidian, but **Obsidian Vault Agent** intentionally occupies a different layer of the stack.
+
+- **[claudesidian](https://github.com/heyitsnoah/claudesidian)** is a curated Obsidian *vault template* and set of scripts for using Claude Code effectively. It focuses on PARA-style organization, bootstrap workflows, and maintenance utilities, but does not provide an Obsidian plugin, embedded UI, or runtime integration. Vault Agent, by contrast, is a first-class Obsidian plugin that embeds terminals and agent-aware execution directly into the editor.
+
+- **[obsidian-agent-client](https://github.com/RAIT-09/obsidian-agent-client)** provides a chat-centric side panel for interacting with ACP-compatible agents such as Claude Code, Codex, and Gemini. Its primary abstraction is conversational AI. Vault Agent instead centers on **execution surfaces**: embedded terminals, file-system-aware commands, and vault-synchronized context, treating agents as operators acting *inside* your workspace rather than chat bots alongside it.
+
+In short, Vault Agent is not a chat UI or a vault template. It is an **execution substrate** for running and contextualizing agents *inside* your Obsidian vault, tightly integrated with notes, paths, backlinks, and the local system.
+
+If you are primarily looking for a chat-based AI assistant inside Obsidian, other plugins may be a better fit. Vault Agent is for those who want agents to *execute* in their workspace, not just converse.
+
 ## Installation
 
 1. Install plugin.
-    - Community plugins
-        1. Install the [plugin][community plugin] from community plugins directly.
     - Manual
-        1. Create directory `terminal` under `.obsidian/plugins` of your vault.
+        1. Create directory `terminal-ai` under `.obsidian/plugins` of your vault.
         2. Place `manifest.json`, `main.js`, and `styles.css` from the [latest release] into the directory.
-    - Building (rolling)
+    - Building (from source)
         1. Clone this repository, including its submodules.
         2. Install [npm](https://docs.npmjs.com/downloading-and-installing-node-js-and-npm).
         3. Run `npm install` in the root directory.
         4. Run `npm run obsidian:install <vault directory>` in the root directory.
-    - [Obsidian42 - BRAT](https://obsidian.md/plugins?id=obsidian42-brat) (rolling)
-        - See [their readme](https://github.com/TfTHacker/obsidian42-brat#readme).
+    - [Obsidian42 - BRAT](https://obsidian.md/plugins?id=obsidian42-brat)
+        - Add `liuyixin-louis/obsidian-vault-agent` as a beta plugin.
+        - See [BRAT readme](https://github.com/TfTHacker/obsidian42-brat#readme) for details.
 2. (optional for Windows, recommended) Install Python and dependencies.
     1. Install [Python] 3.10/+.
     2. (Windows only) Run `pip3 install psutil==5.9.5 pywinctl==0.0.50 typing_extensions==4.7.1`. <!-- Update `README.md`, `magic.ts`, and `requirements.txt` together. -->
@@ -97,7 +117,7 @@ For first time users, read the [installation](#installation) section first!
     - \(3\) Open command palette
     - \(4\) Use keyboard shortcuts
 
-### AI helpers (MVP)
+## AI Integration
 
 - Context push: active file/folder changes are debounced and saved to `.obsidian/ai-context.json` with vault + system paths and `updatedAt`.
 - Drag & drop: dropping files/folders onto the terminal pastes their paths into the terminal.
@@ -191,7 +211,7 @@ This project uses [`changesets`](https://github.com/changesets/changesets) to ma
 "example": patch
 ---
 
-This is an example change. ([GH#1](https://github.com/ghost/example/pull/1) by [@ghost](https://github.com/ghost))
+This is an example change. ([GH#1](https://github.com/liuyixin-louis/obsidian-vault-agent/pull/1) by [@liuyixin-louis](https://github.com/liuyixin-louis))
 ```
 
 ### Todos
@@ -224,4 +244,4 @@ We hope that there will never be any security vulnerabilities, but unfortunately
 
 ### Reporting a vulnerability
 
-Please report a vulnerability by opening an new issue. We will get back to you as soon as possible.
+Please report a vulnerability by [opening a new issue](https://github.com/liuyixin-louis/obsidian-vault-agent/issues/new). We will get back to you as soon as possible.

@@ -20,6 +20,8 @@ import { loadDocumentations } from "./documentations.js"
 import { loadIcons } from "./icons.js"
 import { MAX_HISTORY, PLUGIN_UNLOAD_DELAY } from "./magic.js"
 import { loadNewTabButton } from "./new-tab-button.js"
+import { loadCommands } from "./commands.js"
+import { loadPasteCleaner } from "./paste-cleaner.js"
 import { EarlyPatchManager, loadPatch } from "./patch.js"
 import { loadRevealSync } from "./reveal-sync.js"
 import { LocalSettings, Settings } from "./settings-data.js"
@@ -132,6 +134,12 @@ export class TerminalPlugin
 					Promise.resolve().then(() => { loadTerminal(this) }),
 					Promise.resolve().then(() => { loadAIContext(this) }),
 					Promise.resolve().then(() => { loadBacklinks(this) }),
+					Promise.resolve().then(() => {
+						loadCommands(this)
+					}),
+					Promise.resolve().then(() => {
+						loadPasteCleaner(this)
+					}),
 					Promise.resolve().then(() => {
 						this.register(settings.onMutate(
 							settings0 => settings0.hideStatusBar,
